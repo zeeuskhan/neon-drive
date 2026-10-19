@@ -18,7 +18,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#07111d;fon
 .mode{font-size:10px;color:#d9e8f4;letter-spacing:.12em;margin-top:5px}
 .panel{background:var(--glass);border:1px solid #8cecff44;border-radius:14px;padding:10px 12px;backdrop-filter:blur(10px);box-shadow:0 8px 28px #0004}
 .speed{min-width:108px;text-align:right}.speed strong{font-size:29px;line-height:1;font-weight:800;letter-spacing:-.06em}.speed small{font-size:9px;color:var(--cyan);letter-spacing:.2em;margin-left:5px}
-.stats{position:absolute;top:92px;left:14px;display:flex;gap:8px}.stat-label{font-size:9px;letter-spacing:.15em;color:#9eb8ca}.stat-value{font-size:14px;font-weight:800;margin-top:3px}
+.stats{position:absolute;top:105px;left:14px;display:flex;gap:8px}\n.env-panel{position:absolute;top:54px;left:14px;right:14px;display:flex;gap:8px;pointer-events:auto;flex-wrap:nowrap;max-width:none;z-index:5;overflow-x:auto;padding:2px 0 5px;scrollbar-width:none}.env-panel::-webkit-scrollbar{display:none}\n.env-select{flex:1 1 0;min-width:0;width:33.33%;background:rgba(5,14,25,.94);color:#f4fbff;border:1px solid #8cecff88;border-radius:10px;padding:10px 8px;font-size:11px;max-width:none;outline:none;backdrop-filter:blur(10px);box-shadow:0 4px 14px #0005}\n.env-select:focus{border-color:#69f3ff}\n@media(max-width:420px){.env-panel{top:54px;left:8px;right:8px;gap:5px}.env-select{font-size:10px;padding:9px 4px;min-width:0}}.stat-label{font-size:9px;letter-spacing:.15em;color:#9eb8ca}.stat-value{font-size:14px;font-weight:800;margin-top:3px}
 .center-message{position:absolute;top:27%;left:50%;transform:translateX(-50%);text-align:center;width:90%;text-shadow:0 2px 18px #000}
 .center-message h1{font-size:clamp(25px,7vw,52px);letter-spacing:.13em;margin:0;font-weight:900;font-style:italic}
 .center-message p{font-size:11px;letter-spacing:.18em;color:#c1d5e5;margin:8px 0}
@@ -40,7 +40,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#07111d;fon
 .primary{width:100%;border:0;border-radius:13px;background:linear-gradient(90deg,#40dff7,#87fff0);color:#06111c;font-weight:900;letter-spacing:.16em;padding:16px;margin-top:12px}
 .hint{font-size:10px!important;letter-spacing:.06em;color:#8fa7bb!important}
 #loading{position:fixed;inset:0;display:grid;place-items:center;background:#07111d;color:#bdefff;z-index:5;letter-spacing:.2em;font-size:11px}
-@media(min-width:700px){.ctrl{width:76px;height:76px}.pedal{height:90px;width:76px}.stats{top:100px}.center-message{top:23%}}
+@media(min-width:700px){.ctrl{width:76px;height:76px}.pedal{height:90px;width:76px}.stats{top:105px}.center-message{top:23%}}\n@media(max-height:520px){.env-panel{top:52px;left:12px;right:12px}.stats{top:96px}.bottom{bottom:10px}.ctrl{width:54px;height:54px;border-radius:15px}.pedal{height:62px;width:58px}.nitro{width:48px;height:48px}.center-message{top:20%}}
 </style>
 </head>
 <body>
@@ -55,6 +55,11 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#07111d;fon
   <div class="stats">
     <div class="panel"><div class="stat-label">DISTANCE</div><div class="stat-value"><span id="distance">0</span> <span style="font-size:9px;color:#a5c4d5">M</span></div></div>
     <div class="panel"><div class="stat-label">BEST RUN</div><div class="stat-value"><span id="best">0</span> <span style="font-size:9px;color:#a5c4d5">M</span></div></div>
+  </div>
+  <div class="env-panel" id="envPanel">
+    <select class="env-select" id="timeMode" aria-label="Time of day"><option value="night">🌙 Night</option><option value="day">☀️ Day</option><option value="sunset">🌇 Sunset</option></select>
+    <select class="env-select" id="weatherMode" aria-label="Weather"><option value="clear">☀️ Clear</option><option value="rain">🌧 Rain</option><option value="snow">❄️ Snow / Cold</option><option value="fog">🌫 Fog</option></select>
+    <select class="env-select" id="roadMode" aria-label="Road type"><option value="city">🏙 City Road</option><option value="rainy">🌧 Wet Road</option><option value="offroad">🟤 Off-road</option><option value="mud">🟫 Mud Road</option><option value="desert">🏜 Desert</option><option value="snowroad">❄️ Snow Road</option></select>
   </div>
   <div class="center-message" id="message"><h1>OWN THE NIGHT</h1><p>DRIVE FAST. STAY SHARP.</p><div id="toast">TAP START • TURBO READY</div></div>
   <div class="bottom">
@@ -90,7 +95,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#07111d;fon
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js" onerror="document.querySelector('#loading').style.display='none';document.querySelector('#loadError').style.display='grid'"></script>
 <script>
 if (!window.THREE) { document.querySelector('#loading').style.display='none'; document.querySelector('#loadError').style.display='grid'; throw new Error('Three.js failed to load'); }
-window.addEventListener('error', (e) => { console.error('NEON DRIVE error:', e.message); document.querySelector('#loading').style.display='none'; const er=document.querySelector('#loadError'); er.style.display='grid'; er.querySelector('p').textContent='The 3D game hit a browser error: '+(e.message||'unknown error')+'. Reload the page and keep internet on.'; });
+window.addEventListener('error', (e) => { console.error('NEON DRIVE error:', e.message); if(document.querySelector('#loading').style.display!=='none'){document.querySelector('#loading').style.display='none'; const er=document.querySelector('#loadError'); er.style.display='grid'; er.querySelector('p').textContent='The 3D game hit a browser error: '+(e.message||'unknown error')+'. Reload the page and keep internet on.';} });
 
 const canvas=document.querySelector('#game');
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false,powerPreference:'high-performance'});
@@ -140,8 +145,75 @@ const asphaltTexture=new THREE.CanvasTexture(asphaltCanvas);asphaltTexture.wrapS
 const asphalt=new THREE.MeshStandardMaterial({color:0x9ba6b3,map:asphaltTexture,roughness:.82,metalness:.08}), shoulder=mat(0x141c28,.9), lineMat=mat(0xd5f5ff,.5,.1,{emissive:0x355b70,emissiveIntensity:.5});
 const groundMat=mat(0x091a22,1), mountainMat=mat(0x111e30,1), treeMat=mat(0x102e35,1), trunkMat=mat(0x382c2b,1);
 const road=new THREE.Mesh(new THREE.PlaneGeometry(12,240,1,24),asphalt);road.rotation.x=-Math.PI/2;road.position.set(0,-.08,-90);road.receiveShadow=true;scene.add(road);
+// Runtime world presets: generated locally, no extra assets required.
+const roadPresets={
+ city:{color:0x9ba6b3,roughness:.82,metalness:.08,base:'#202832',speck:70,wet:false,edge:0x00dfff,fog:0x07111d},
+ rainy:{color:0x9eafbf,roughness:.2,metalness:.48,base:'#273744',speck:55,wet:true,edge:0x52dfff,fog:0x172a3c},
+ offroad:{color:0x9a8b6d,roughness:1,metalness:0,base:'#5d503b',speck:72,wet:false,edge:0xb6a17c,fog:0x25241e},
+ mud:{color:0x8c6b4c,roughness:1,metalness:0,base:'#493729',speck:82,wet:false,edge:0x9b7957,fog:0x30251c},
+ desert:{color:0xb9a071,roughness:.95,metalness:0,base:'#b99a5d',speck:50,wet:false,edge:0xd9bd7c,fog:0x9b7749},
+ snowroad:{color:0xd4e2ec,roughness:.72,metalness:.04,base:'#a9bac7',speck:38,wet:true,edge:0xbceeff,fog:0x9eb7c8}
+};
+function makeRoadTexture(preset){
+ const c=document.createElement('canvas');c.width=256;c.height=512;const ctx=c.getContext('2d');
+ ctx.fillStyle=preset.base;ctx.fillRect(0,0,256,512);
+ for(let i=0;i<11000;i++){
+  const v=Math.random()*preset.speck;ctx.fillStyle=`rgba(${v|0},${v|0},${v|0},${Math.random()*.28})`;
+  const s=Math.random()*2.2+.25;ctx.fillRect(Math.random()*256,Math.random()*512,s,s);
+ }
+ if(preset.wet){for(let i=0;i<45;i++){ctx.strokeStyle='rgba(170,220,255,.10)';ctx.lineWidth=1+Math.random()*3;ctx.beginPath();ctx.moveTo(Math.random()*256,Math.random()*512);ctx.lineTo(Math.random()*256,Math.random()*512);ctx.stroke();}}
+ if(preset===roadPresets.mud||preset===roadPresets.offroad){for(let i=0;i<18;i++){ctx.strokeStyle='rgba(20,12,7,.2)';ctx.lineWidth=4+Math.random()*9;ctx.beginPath();ctx.moveTo(90+Math.random()*70,Math.random()*512);ctx.lineTo(80+Math.random()*90,Math.random()*512);ctx.stroke();}}
+ if(preset===roadPresets.snowroad){ctx.fillStyle='rgba(255,255,255,.18)';for(let i=0;i<180;i++)ctx.fillRect(Math.random()*256,Math.random()*512,2+Math.random()*8,2+Math.random()*5);}
+ const tex=new THREE.CanvasTexture(c);tex.wrapS=THREE.RepeatWrapping;tex.wrapT=THREE.RepeatWrapping;tex.repeat.set(1,22);tex.colorSpace=THREE.SRGBColorSpace;return tex;
+}
+const roadTextures={};for(const [name,preset] of Object.entries(roadPresets))roadTextures[name]=makeRoadTexture(preset);
+const weatherGeo=new THREE.BufferGeometry();const weatherCount=520;const weatherPositions=new Float32Array(weatherCount*3);
+for(let i=0;i<weatherCount;i++){weatherPositions[i*3]=(Math.random()-.5)*34;weatherPositions[i*3+1]=Math.random()*14;weatherPositions[i*3+2]=-Math.random()*100;}
+weatherGeo.setAttribute('position',new THREE.BufferAttribute(weatherPositions,3));
+const weatherParticles=new THREE.Points(weatherGeo,new THREE.PointsMaterial({color:0xaeeaff,size:.09,transparent:true,opacity:.7}));
+weatherParticles.visible=false;scene.add(weatherParticles);
+let currentRoad='city',currentWeather='clear',currentTime='night';
+const ambientDefault=2;
+function applyWorld(){
+ const p=roadPresets[currentRoad]||roadPresets.city;
+ asphalt.map=roadTextures[currentRoad]||roadTextures.city;asphalt.color.setHex(p.color);asphalt.roughness=p.roughness;asphalt.metalness=p.metalness;asphalt.needsUpdate=true;
+ lineMat.color.setHex(p.edge);
+ roadSheen.visible=!!p.wet||currentWeather==='rain';
+ roadSheen.material.opacity=currentRoad==='rainy'||currentWeather==='rain'?.48:currentRoad==='snowroad'?.18:.12;
+ const day=currentTime==='day',sunset=currentTime==='sunset';
+ const bg=day?0x8bb7d9:sunset?0x5c3045:p.fog;
+ scene.background.setHex(bg);scene.fog.color.setHex(bg);
+ scene.fog.density=currentWeather==='fog'?.035:day?.0035:.0125;
+ moon.color.setHex(day?0xfff1d0:sunset?0xff9a72:0xc7e6ff);moon.intensity=day?3.2:sunset?2.7:2.5;
+ scene.children.forEach(o=>{if(o.isMesh&&o.material&&o.material.emissive){o.material.emissiveIntensity=currentTime==='day'?.45:1.7;}});
+ cyanLight.intensity=day?8:currentTime==='sunset'?18:38;
+ weatherParticles.visible=currentWeather==='rain'||currentWeather==='snow';
+ weatherParticles.material.color.setHex(currentWeather==='snow'?0xffffff:0x9fdcff);
+ weatherParticles.material.size=currentWeather==='snow'?.14:.075;
+ weatherParticles.material.opacity=currentWeather==='snow'?.8:.58;
+ const fx=document.querySelector('#cinematicFx');
+ fx.style.background=currentWeather==='rain'?'linear-gradient(180deg,rgba(100,160,200,.12),rgba(2,8,18,.25)),radial-gradient(ellipse at center,transparent 38%,rgba(1,5,14,.4) 100%)':currentWeather==='snow'?'linear-gradient(180deg,rgba(220,240,255,.15),transparent 55%,rgba(180,220,255,.16))':'radial-gradient(ellipse at center,transparent 42%,rgba(1,5,14,.38) 100%)';
+}
+function updateWeather(dt){
+ if(!weatherParticles.visible)return;
+ const pos=weatherParticles.geometry.attributes.position;
+ for(let i=0;i<weatherCount;i++){
+  let x=pos.getX(i),y=pos.getY(i),z=pos.getZ(i);
+  if(currentWeather==='rain'){x+=dt*2.8;y-=dt*15;z+=dt*3;}
+  else {x+=Math.sin((i*13+performance.now()*.001))*.002;y-=dt*(1.2+(i%7)*.12);z+=dt*.5;}
+  if(y<0){y=12+Math.random()*3;x=(Math.random()-.5)*34;z=-Math.random()*100;}
+  if(z>12)z=-100-Math.random()*15;
+  pos.setXYZ(i,x,y,z);
+ }
+ pos.needsUpdate=true;
+}
+document.querySelector('#timeMode').addEventListener('change',e=>{currentTime=e.target.value;applyWorld();});
+document.querySelector('#weatherMode').addEventListener('change',e=>{currentWeather=e.target.value;applyWorld();});
+document.querySelector('#roadMode').addEventListener('change',e=>{currentRoad=e.target.value;applyWorld();});
+// Initial world setup is applied after road sheen is created.
 // Subtle road sheen for a more cinematic night drive.
 const roadSheen=new THREE.Mesh(new THREE.PlaneGeometry(3.2,220),new THREE.MeshStandardMaterial({color:0x263f50,roughness:.24,metalness:.35,transparent:true,opacity:.28}));roadSheen.rotation.x=-Math.PI/2;roadSheen.position.set(.1,-.065,-90);scene.add(roadSheen);
+applyWorld();
 const ground=new THREE.Mesh(new THREE.PlaneGeometry(240,260),groundMat);ground.rotation.x=-Math.PI/2;ground.position.set(0,-.18,-95);scene.add(ground);
 for(const x of [-6.4,6.4]){const s=new THREE.Mesh(new THREE.BoxGeometry(.8,.15,240),shoulder);s.position.set(x,-.01,-90);scene.add(s);}
 for(const x of [-4.7,4.7]){const edge=new THREE.Mesh(new THREE.BoxGeometry(.09,.025,240),lineMat);edge.position.set(x,.015,-90);scene.add(edge);}
@@ -350,6 +422,7 @@ function animate(){
  requestAnimationFrame(animate);
  const dt=Math.min(clock.getDelta(),.04);
  const active=state.running;
+  updateWeather(dt);
  const gas=touch.gas||keys['arrowup']||keys['w'];
  const brake=touch.brake||keys['arrowdown']||keys['s'];
  const left=touch.left||keys['arrowleft']||keys['a'];
